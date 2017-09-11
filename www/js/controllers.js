@@ -41,6 +41,7 @@ angular.module('starter.controllers', [])
        .success(function(data) {
          $rootScope.userInfo = data;
          console.log($rootScope.userInfo);
+         $scope.loginData = {};
        })
        .finally(function() {
          $scope.closeLogin();
@@ -63,9 +64,10 @@ angular.module('starter.controllers', [])
 .controller('PlaylistCtrl', function($scope, $stateParams, $rootScope, $http) {
   console.log($rootScope.userInfo);
   if(!$rootScope.userInfo) return;
+  $scope.boards = [];
   $http({
 	  method: 'GET',
-	  url: 'http://localhost:3000/api/boards/1?access_token='+$rootScope.userInfo.id,
+	  url: 'http://localhost:3000/api/boards/?access_token='+$rootScope.userInfo.id,
   	headers: {'Content-Type': 'application/json; charset=utf-8'}
     })
      .success(function(data) {
@@ -73,7 +75,6 @@ angular.module('starter.controllers', [])
        console.log(data);
      })
      .finally(function() {
-       // Stop the ion-refresher from spinning
-       //$scope.$broadcast('scroll.refreshComplete');
+       
      })
 });
