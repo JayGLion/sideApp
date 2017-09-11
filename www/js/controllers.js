@@ -1,6 +1,6 @@
 angular.module('starter.controllers', [])
 
-.controller('AppCtrl', function($scope, $ionicModal, $timeout) {
+.controller('AppCtrl', function($rootScope, $scope, $ionicModal, $timeout, $http) {
 
   // With the new view caching in Ionic, Controllers are only called
   // when they are recreated or on app start, instead of every page change.
@@ -32,12 +32,20 @@ angular.module('starter.controllers', [])
   // Perform the login action when the user submits the login form
   $scope.doLogin = function() {
     console.log('Doing login', $scope.loginData);
-
-    // Simulate a login delay. Remove this and replace with your login
-    // code if using a login system
-    $timeout(function() {
-      $scope.closeLogin();
-    }, 1000);
+    $http({
+      method: 'POST',
+      url: 'http://localhost:3000/api/Users/login',
+      data: $scope.loginData,
+      headers: {'Content-Type': 'application/json; charset=utf-8'}
+      })
+       .success(function(data) {
+         $rootScope.userInfo = data;
+         console.log($rootScope.userInfo);
+       })
+       .finally(function() {
+         $scope.closeLogin();
+       })
+    
   };
 })
 
@@ -52,5 +60,20 @@ angular.module('starter.controllers', [])
   ];
 })
 
-.controller('PlaylistCtrl', function($scope, $stateParams) {
+.controller('PlaylistCtrl', function($scope, $stateParams, $rootScope, $http) {
+  console.log($rootScope.userInfo);
+  if(!$rootScope.userInfo) return;
+  $http({
+	  method: 'GET',
+	  url: 'http://localhost:3000/api/boards/1?access_token='+$rootScope.userInfo.id,
+  	headers: {'Content-Type': 'application/json; charset=utf-8'}
+    })
+     .success(function(data) {
+       $scope.boards = data;
+       console.log(data);
+     })
+     .finally(function() {
+       // Stop the ion-refresher from spinning
+       //$scope.$broadcast('scroll.refreshComplete');
+     })
 });
